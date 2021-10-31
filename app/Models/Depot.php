@@ -15,12 +15,12 @@ class Depot extends Model
     ];
 
     public static function getLastInserted(){
-        return Depot::query()
+        return self::query()
             ->orderBy('created_at','desc')
             ->first();
     }
 
-    public function getNameAttribute($key)
+    public function getNameAttribute($key): string
     {
         return ucwords($key);
     }

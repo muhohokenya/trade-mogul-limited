@@ -24,3 +24,12 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::group(['prefix'=>'depots'],function (){
     Route::get('/', [App\Http\Controllers\DepotController::class, 'index'])->name('depots.index');
 });
+
+Route::group(['prefix'=>'vehicles'],function (){
+    Route::get('/', [App\Http\Controllers\VehiclesController::class, 'index'])->name('vehicles.index');
+    Route::post('/store', [App\Http\Controllers\VehiclesController::class, 'store'])->name('vehicles.store');
+});
+
+Route::group(['prefix'=>'orders'],function (){
+    Route::get('/', [App\Http\Controllers\OrdersController::class, 'index'])->name('orders.index');
+});
