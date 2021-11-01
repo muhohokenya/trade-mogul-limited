@@ -1,7 +1,21 @@
 <template>
     <main class="container">
         <section class="container">
+
+
             <div class="row">
+                <div class="col">
+                    <!-- Button trigger modal -->
+                    <button type="button" class="btn btn-outline-primary" data-toggle="modal"
+                            data-target="#addDepotModal">
+                        Add Vehicle
+                    </button>
+                </div>
+            </div>
+
+            <div class="row mt-5">
+
+
                 <div class="col">
 
                     <table class="table table-bordered">
@@ -10,7 +24,8 @@
                                 <th>#</th>
                                 <th>Reg No</th>
                                 <th>Status</th>
-                                <th colspan="2">Action</th>
+                                <th>Orders</th>
+                                <th colspan="4">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -18,6 +33,27 @@
                             <td>{{index+=1}}</td>
                             <td>{{vehicle.reg_no}}</td>
                             <td>{{vehicle.vehicle_status}}</td>
+                            <td>{{vehicle.orders.length}}</td>
+                            <td>
+                                <div v-if="vehicle.vehicle_status==='Available'">
+
+                                    <div v-if="vehicle.orders.length">
+                                        <button class="btn btn-outline-success" @click="markLoading(vehicle)">Mark Loading</button>
+                                    </div>
+                                    <div v-else>
+                                        No Orders Assigned
+                                    </div>
+
+                                </div>
+                                <div v-else-if="vehicle.vehicle_status==='Loading'">
+                                    <button class="btn btn-outline-primary" @click="markOnTransit(vehicle)">Mark On Transit</button>
+                                </div>
+                                <div v-else-if="vehicle.vehicle_status==='On_transit'">
+                                    On Transit
+                                </div>
+                            </td>
+
+
                             <td>
                                 <!-- Button trigger modal -->
                                 <button @click="setVehicle(vehicle)" type="button" class="btn btn-primary" data-toggle="modal" data-target="#editModal">
@@ -67,11 +103,7 @@
                     </div>
 
 
-                    <!-- Button trigger modal -->
-                    <button type="button" class="btn btn-outline-primary" data-toggle="modal"
-                            data-target="#addDepotModal">
-                        Add Vehicle
-                    </button>
+
 
                     <!-- Modal -->
                     <div class="modal fade" id="addDepotModal" data-backdrop="static" data-keyboard="false"
@@ -121,8 +153,13 @@
 </template>
 
 <script>
+import VehiclesMixins from "../../Mixins/VehiclesMixins";
+
 export default {
     name: "Vehicles",
+    mixins:[
+        VehiclesMixins
+    ],
 
     data() {
         return {
@@ -150,18 +187,34 @@ export default {
     },
 
     mounted() {
-        this.fetchVehicles()
+        this.getVehicles()
     },
 
 
     methods: {
+        markLoading(vehicle){
+            this.markVehicleLoading(vehicle).then(response=>{
+                this.getVehicles()
+            }).catch(error=>{});
+        },
+
+        markOnTransit(vehicle){
+            this.markVehicleOnTransit(vehicle).then(response=>{
+                this.getVehicles()
+            }).catch(error=>{});
+        },
+
+        markAvailable(vehicle){
+            this.markVehicleAvailable(vehicle).then(response=>{
+                this.getVehicles()
+            }).catch(error=>{});
+        },
         setVehicle(vehicle){
             this.edit_form.edit_vehicle = vehicle.reg_no
             this.edit_form.vehicle_id = vehicle.id
         },
-        fetchVehicles() {
-            let url = base_url + 'vehicles'
-            axios.get(url).then(response => {
+        getVehicles() {
+            this.fetchVehicles().then(response => {
                 this.vehicles = response.data
             }).catch(error => {
                 this.errors = error.response.data.errors

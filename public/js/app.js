@@ -2205,6 +2205,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _Mixins_VehiclesMixins__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../Mixins/VehiclesMixins */ "./resources/js/Mixins/VehiclesMixins.js");
+/* harmony import */ var _Mixins_OrderMixins__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../Mixins/OrderMixins */ "./resources/js/Mixins/OrderMixins.js");
 //
 //
 //
@@ -2274,17 +2275,78 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "Orders",
-  mixins: [_Mixins_VehiclesMixins__WEBPACK_IMPORTED_MODULE_1__["default"]],
+  mixins: [_Mixins_VehiclesMixins__WEBPACK_IMPORTED_MODULE_1__["default"], _Mixins_OrderMixins__WEBPACK_IMPORTED_MODULE_2__["default"]],
   data: function data() {
     return {
       orders: [],
       vehicles: [],
       order: '',
       moment: '',
+      submitting: false,
       allocate_form: {
         vehicle: '',
         order_id: '',
@@ -2298,12 +2360,71 @@ __webpack_require__.r(__webpack_exports__);
   mounted: function mounted() {
     var _this = this;
 
-    this.fetchOrders();
+    this.fetchOrders(); //Reusable Method from the Mixins
+
     this.fetchVehicles().then(function (response) {
       _this.vehicles = response.data;
     });
   },
   methods: {
+    getLoadingOrders: function getLoadingOrders() {
+      var _this2 = this;
+
+      this.fetchLoadingOrders().then(function (response) {
+        _this2.orders = response.data;
+      })["catch"](function (error) {});
+    },
+    getDispatchedOrders: function getDispatchedOrders() {
+      var _this3 = this;
+
+      this.fetchDispatchedOrders().then(function (response) {
+        _this3.orders = response.data;
+      })["catch"](function (error) {});
+    },
+    getPendingOrders: function getPendingOrders() {
+      var _this4 = this;
+
+      this.fetchPendingOrders().then(function (response) {
+        _this4.orders = response.data;
+      })["catch"](function (error) {});
+    },
+    markDispatched: function markDispatched(order) {
+      var _this5 = this;
+
+      var url = base_url + 'orders/mark_order_dispatched';
+      var data = {
+        order: order.id
+      };
+      axios.post(url, data).then(function (response) {
+        _this5.fetchOrders();
+      })["catch"](function (error) {});
+    },
+    markDelivered: function markDelivered(order) {
+      var _this6 = this;
+
+      var url = base_url + 'orders/mark_order_delivered';
+      var data = {
+        order: order.id
+      };
+      axios.post(url, data).then(function (response) {
+        _this6.fetchOrders();
+      })["catch"](function (error) {});
+    },
+    allocate: function allocate() {
+      var _this7 = this;
+
+      this.submitting = true;
+      var url = base_url + 'orders/allocate';
+      var data = {
+        vehicle: this.allocate_form.vehicle,
+        order_id: this.allocate_form.order_id
+      };
+      axios.post(url, data).then(function (response) {
+        _this7.fetchOrders();
+
+        $("#staticBackdrop").modal('hide');
+      })["catch"](function (error) {});
+    },
     clearForm: function clearForm() {
       this.order = '';
       this.allocate_form.vehicle = '';
@@ -2316,11 +2437,11 @@ __webpack_require__.r(__webpack_exports__);
       this.allocate_form.order_item = order.item;
     },
     fetchOrders: function fetchOrders() {
-      var _this2 = this;
+      var _this8 = this;
 
       var url = base_url + 'orders';
       axios.get(url).then(function (response) {
-        _this2.orders = response.data;
+        _this8.orders = response.data;
       })["catch"](function (error) {});
     }
   }
@@ -2339,6 +2460,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/* harmony import */ var _Mixins_VehiclesMixins__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../Mixins/VehiclesMixins */ "./resources/js/Mixins/VehiclesMixins.js");
 //
 //
 //
@@ -2461,8 +2583,42 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "Vehicles",
+  mixins: [_Mixins_VehiclesMixins__WEBPACK_IMPORTED_MODULE_0__["default"]],
   data: function data() {
     return {
       errors: '',
@@ -2485,59 +2641,129 @@ __webpack_require__.r(__webpack_exports__);
   },
   created: function created() {},
   mounted: function mounted() {
-    this.fetchVehicles();
+    this.getVehicles();
   },
   methods: {
+    markLoading: function markLoading(vehicle) {
+      var _this = this;
+
+      this.markVehicleLoading(vehicle).then(function (response) {
+        _this.getVehicles();
+      })["catch"](function (error) {});
+    },
+    markOnTransit: function markOnTransit(vehicle) {
+      var _this2 = this;
+
+      this.markVehicleOnTransit(vehicle).then(function (response) {
+        _this2.getVehicles();
+      })["catch"](function (error) {});
+    },
+    markAvailable: function markAvailable(vehicle) {
+      var _this3 = this;
+
+      this.markVehicleAvailable(vehicle).then(function (response) {
+        _this3.getVehicles();
+      })["catch"](function (error) {});
+    },
     setVehicle: function setVehicle(vehicle) {
       this.edit_form.edit_vehicle = vehicle.reg_no;
       this.edit_form.vehicle_id = vehicle.id;
     },
-    fetchVehicles: function fetchVehicles() {
-      var _this = this;
+    getVehicles: function getVehicles() {
+      var _this4 = this;
 
-      var url = base_url + 'vehicles';
-      axios.get(url).then(function (response) {
-        _this.vehicles = response.data;
+      this.fetchVehicles().then(function (response) {
+        _this4.vehicles = response.data;
       })["catch"](function (error) {
-        _this.errors = error.response.data.errors;
+        _this4.errors = error.response.data.errors;
       });
     },
     addVehicle: function addVehicle() {
-      var _this2 = this;
+      var _this5 = this;
 
       this.saving = true;
       var url = base_url + 'vehicles';
       axios.post(url, this.form).then(function (response) {
-        _this2.vehicles.push(response.data);
+        _this5.vehicles.push(response.data);
 
-        _this2.saving = false;
-        _this2.form.reg_no = '';
+        _this5.saving = false;
+        _this5.form.reg_no = '';
         $("#addDepotModal").modal('hide');
       })["catch"](function (error) {
-        _this2.errors = error.response.data.errors;
-        _this2.saving = false;
+        _this5.errors = error.response.data.errors;
+        _this5.saving = false;
       });
     },
     updateVehicle: function updateVehicle() {
-      var _this3 = this;
+      var _this6 = this;
 
       this.updating = true;
       var url = base_url + 'vehicles/' + this.edit_form.vehicle_id;
       axios.put(url, this.edit_form).then(function (response) {
-        _this3.updating = false;
+        _this6.updating = false;
 
-        var index = _this3.vehicles.findIndex(function (x) {
-          return x.id === _this3.edit_form.vehicle_id;
+        var index = _this6.vehicles.findIndex(function (x) {
+          return x.id === _this6.edit_form.vehicle_id;
         });
 
-        _this3.vehicles.splice(index, 1);
+        _this6.vehicles.splice(index, 1);
 
-        _this3.vehicles.push(response.data);
+        _this6.vehicles.push(response.data);
 
         $("#editModal").modal('hide');
       })["catch"](function (error) {
-        _this3.errors = error.response.data.errors;
-        _this3.updating = false;
+        _this6.errors = error.response.data.errors;
+        _this6.updating = false;
+      });
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./resources/js/Mixins/OrderMixins.js":
+/*!********************************************!*\
+  !*** ./resources/js/Mixins/OrderMixins.js ***!
+  \********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  methods: {
+    fetchOrders: function fetchOrders() {
+      var url = base_url + 'orders';
+      return axios.get(url).then(function (response) {
+        return response;
+      })["catch"](function (error) {
+        return error.response.data.errors;
+      });
+    },
+    fetchLoadingOrders: function fetchLoadingOrders() {
+      var url = base_url + 'orders/loading';
+      return axios.get(url).then(function (response) {
+        return response;
+      })["catch"](function (error) {
+        return error.response.data.errors;
+      });
+    },
+    fetchDispatchedOrders: function fetchDispatchedOrders() {
+      var url = base_url + 'orders/dispatched';
+      return axios.get(url).then(function (response) {
+        return response;
+      })["catch"](function (error) {
+        return error.response.data.errors;
+      });
+    },
+    fetchPendingOrders: function fetchPendingOrders() {
+      var url = base_url + 'orders/pending';
+      return axios.get(url).then(function (response) {
+        return response;
+      })["catch"](function (error) {
+        return error.response.data.errors;
       });
     }
   }
@@ -2561,6 +2787,39 @@ __webpack_require__.r(__webpack_exports__);
     fetchVehicles: function fetchVehicles() {
       var url = base_url + 'vehicles';
       return axios.get(url).then(function (response) {
+        return response;
+      })["catch"](function (error) {
+        return error.response.data.errors;
+      });
+    },
+    markVehicleLoading: function markVehicleLoading(vehicle) {
+      var url = base_url + 'vehicles/mark_loading';
+      var data = {
+        vehicle: vehicle.id
+      };
+      return axios.post(url, data).then(function (response) {
+        return response;
+      })["catch"](function (error) {
+        return error.response.data.errors;
+      });
+    },
+    markVehicleOnTransit: function markVehicleOnTransit(vehicle) {
+      var url = base_url + 'vehicles/mark_on_transit';
+      var data = {
+        vehicle: vehicle.id
+      };
+      return axios.post(url, data).then(function (response) {
+        return response;
+      })["catch"](function (error) {
+        return error.response.data.errors;
+      });
+    },
+    markVehicleAvailable: function markVehicleAvailable(vehicle) {
+      var url = base_url + 'vehicles/mark_available';
+      var data = {
+        vehicle: vehicle.id
+      };
+      return axios.post(url, data).then(function (response) {
         return response;
       })["catch"](function (error) {
         return error.response.data.errors;
@@ -60270,6 +60529,80 @@ var render = function () {
   return _c("main", { staticClass: "container" }, [
     _c("section", { staticClass: "row" }, [
       _c("div", { staticClass: "col" }, [
+        _c("ul", { staticClass: "nav nav-pills nav-fill navbar-light" }, [
+          _c("li", { staticClass: "nav-item" }, [
+            _c(
+              "a",
+              {
+                staticClass: "nav-link active",
+                attrs: { href: "#" },
+                on: {
+                  click: function ($event) {
+                    $event.preventDefault()
+                    return _vm.fetchOrders.apply(null, arguments)
+                  },
+                },
+              },
+              [_vm._v("All Orders")]
+            ),
+          ]),
+          _vm._v(" "),
+          _c("li", { staticClass: "nav-item" }, [
+            _c(
+              "a",
+              {
+                staticClass: "nav-link",
+                attrs: { href: "#" },
+                on: {
+                  click: function ($event) {
+                    $event.preventDefault()
+                    return _vm.getLoadingOrders.apply(null, arguments)
+                  },
+                },
+              },
+              [_vm._v("Loading Orders")]
+            ),
+          ]),
+          _vm._v(" "),
+          _c("li", { staticClass: "nav-item" }, [
+            _c(
+              "a",
+              {
+                staticClass: "nav-link",
+                attrs: { href: "#" },
+                on: {
+                  click: function ($event) {
+                    $event.preventDefault()
+                    return _vm.getDispatchedOrders.apply(null, arguments)
+                  },
+                },
+              },
+              [_vm._v("Dispatched Orders")]
+            ),
+          ]),
+          _vm._v(" "),
+          _c("li", { staticClass: "nav-item" }, [
+            _c(
+              "a",
+              {
+                staticClass: "nav-link",
+                attrs: { href: "#" },
+                on: {
+                  click: function ($event) {
+                    $event.preventDefault()
+                    return _vm.getPendingOrders.apply(null, arguments)
+                  },
+                },
+              },
+              [_vm._v("Pending Orders")]
+            ),
+          ]),
+        ]),
+      ]),
+    ]),
+    _vm._v(" "),
+    _c("section", { staticClass: "row mt-5" }, [
+      _c("div", { staticClass: "col" }, [
         _c(
           "table",
           { staticClass: "table table-bordered table-striped table-hover" },
@@ -60297,27 +60630,115 @@ var render = function () {
                   _c("td", [_vm._v(_vm._s(order.order_status))]),
                   _vm._v(" "),
                   _c("td", [
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-primary",
-                        attrs: {
-                          type: "button",
-                          "data-toggle": "modal",
-                          "data-target": "#staticBackdrop",
-                        },
-                        on: {
-                          click: function ($event) {
-                            return _vm.allocateToVehicle(order)
+                    order.vehicle
+                      ? _c("span", [_vm._v(_vm._s(order.vehicle.reg_no))])
+                      : _c("span", [_vm._v("Not Allocated")]),
+                  ]),
+                  _vm._v(" "),
+                  _c("td", [
+                    order.order_status === "pending"
+                      ? _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-outline-primary",
+                            attrs: {
+                              type: "button",
+                              "data-toggle": "modal",
+                              "data-target": "#staticBackdrop",
+                            },
+                            on: {
+                              click: function ($event) {
+                                return _vm.allocateToVehicle(order)
+                              },
+                            },
                           },
-                        },
-                      },
-                      [
-                        _vm._v(
-                          "\n                            Allocate to vehicle\n                        "
+                          [
+                            _vm._v(
+                              "\n                            Allocate to vehicle\n                        "
+                            ),
+                          ]
+                        )
+                      : _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-success",
+                            attrs: { disabled: "" },
+                          },
+                          [_vm._v("Allocated")]
                         ),
-                      ]
-                    ),
+                  ]),
+                  _vm._v(" "),
+                  _c("td", [
+                    order.order_status !== "pending"
+                      ? _c("div", [
+                          order.order_status === "loading" &&
+                          order.order_status !== "dispatched"
+                            ? _c(
+                                "button",
+                                {
+                                  staticClass: "btn btn-outline-success",
+                                  on: {
+                                    click: function ($event) {
+                                      return _vm.markDispatched(order)
+                                    },
+                                  },
+                                },
+                                [_vm._v("Mark Dispatched")]
+                              )
+                            : _c(
+                                "button",
+                                {
+                                  staticClass: "btn btn-success",
+                                  attrs: { disabled: "" },
+                                },
+                                [_vm._v("Dispatched")]
+                              ),
+                        ])
+                      : _c("div", [
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-outline-info",
+                              attrs: { disabled: "" },
+                            },
+                            [_vm._v("Not Allocated")]
+                          ),
+                        ]),
+                  ]),
+                  _vm._v(" "),
+                  _c("td", [
+                    order.order_status === "dispatched" &&
+                    order.order_status !== "delivered"
+                      ? _c("div", [
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-outline-primary",
+                              on: {
+                                click: function ($event) {
+                                  return _vm.markDelivered(order)
+                                },
+                              },
+                            },
+                            [_vm._v("Mark Delivered")]
+                          ),
+                        ])
+                      : order.order_status === "delivered"
+                      ? _c("div", [
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-success",
+                              attrs: { disabled: "" },
+                            },
+                            [_vm._v("Delivered")]
+                          ),
+                        ])
+                      : _c("div", [
+                          _vm._v(
+                            "\n                            Not Delivered\n                        "
+                          ),
+                        ]),
                   ]),
                 ])
               }),
@@ -60344,107 +60765,128 @@ var render = function () {
               _c("div", { staticClass: "modal-content" }, [
                 _vm._m(1),
                 _vm._v(" "),
-                _c("div", { staticClass: "modal-body" }, [
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", { attrs: { for: "order" } }, [_vm._v("Order")]),
-                    _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.allocate_form.order_item,
-                          expression: "allocate_form.order_item",
-                        },
-                      ],
-                      staticClass: "form-control",
-                      attrs: { type: "text", readonly: "" },
-                      domProps: { value: _vm.allocate_form.order_item },
-                      on: {
-                        input: function ($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.$set(
-                            _vm.allocate_form,
-                            "order_item",
-                            $event.target.value
-                          )
-                        },
+                _c(
+                  "form",
+                  {
+                    on: {
+                      submit: function ($event) {
+                        $event.preventDefault()
+                        return _vm.allocate.apply(null, arguments)
                       },
-                    }),
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", { attrs: { for: "vehicle" } }, [
-                      _vm._v("Select Vehicle"),
+                    },
+                  },
+                  [
+                    _c("div", { staticClass: "modal-body" }, [
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", { attrs: { for: "order" } }, [
+                          _vm._v("Order"),
+                        ]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.allocate_form.order_item,
+                              expression: "allocate_form.order_item",
+                            },
+                          ],
+                          staticClass: "form-control",
+                          attrs: { type: "text", readonly: "" },
+                          domProps: { value: _vm.allocate_form.order_item },
+                          on: {
+                            input: function ($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.allocate_form,
+                                "order_item",
+                                $event.target.value
+                              )
+                            },
+                          },
+                        }),
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", { attrs: { for: "vehicle" } }, [
+                          _vm._v("Select Vehicle"),
+                        ]),
+                        _vm._v(" "),
+                        _c(
+                          "select",
+                          {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.allocate_form.vehicle,
+                                expression: "allocate_form.vehicle",
+                              },
+                            ],
+                            staticClass: "form-control",
+                            attrs: { name: "vehicle", id: "vehicle" },
+                            on: {
+                              change: function ($event) {
+                                var $$selectedVal = Array.prototype.filter
+                                  .call($event.target.options, function (o) {
+                                    return o.selected
+                                  })
+                                  .map(function (o) {
+                                    var val = "_value" in o ? o._value : o.value
+                                    return val
+                                  })
+                                _vm.$set(
+                                  _vm.allocate_form,
+                                  "vehicle",
+                                  $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                )
+                              },
+                            },
+                          },
+                          _vm._l(_vm.vehicles, function (vehicle) {
+                            return _c(
+                              "option",
+                              { domProps: { value: vehicle.id } },
+                              [
+                                _vm._v(
+                                  "\n                                            " +
+                                    _vm._s(vehicle.reg_no) +
+                                    "\n                                        "
+                                ),
+                              ]
+                            )
+                          }),
+                          0
+                        ),
+                      ]),
                     ]),
                     _vm._v(" "),
-                    _c(
-                      "select",
-                      {
-                        directives: [
-                          {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.allocate_form.vehicle,
-                            expression: "allocate_form.vehicle",
-                          },
-                        ],
-                        staticClass: "form-control",
-                        attrs: { name: "vehicle", id: "vehicle" },
-                        on: {
-                          change: function ($event) {
-                            var $$selectedVal = Array.prototype.filter
-                              .call($event.target.options, function (o) {
-                                return o.selected
-                              })
-                              .map(function (o) {
-                                var val = "_value" in o ? o._value : o.value
-                                return val
-                              })
-                            _vm.$set(
-                              _vm.allocate_form,
-                              "vehicle",
-                              $event.target.multiple
-                                ? $$selectedVal
-                                : $$selectedVal[0]
-                            )
-                          },
+                    _c("div", { staticClass: "modal-footer" }, [
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-secondary",
+                          attrs: { type: "button", "data-dismiss": "modal" },
+                          on: { click: _vm.clearForm },
                         },
-                      },
-                      _vm._l(_vm.vehicles, function (vehicle) {
-                        return _c(
-                          "option",
-                          { domProps: { value: vehicle.reg_no } },
-                          [_vm._v(_vm._s(vehicle.reg_no))]
-                        )
-                      }),
-                      0
-                    ),
-                  ]),
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "modal-footer" }, [
-                  _c(
-                    "button",
-                    {
-                      staticClass: "btn btn-secondary",
-                      attrs: { type: "button", "data-dismiss": "modal" },
-                      on: { click: _vm.clearForm },
-                    },
-                    [_vm._v("Close")]
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "button",
-                    {
-                      staticClass: "btn btn-primary",
-                      attrs: { type: "button" },
-                    },
-                    [_vm._v("Allocate")]
-                  ),
-                ]),
+                        [_vm._v("Close\n                                ")]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-primary",
+                          attrs: { type: "submit" },
+                        },
+                        [_vm._v("Allocate")]
+                      ),
+                    ]),
+                  ]
+                ),
               ]),
             ]),
           ]
@@ -60468,7 +60910,9 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("Order Status")]),
         _vm._v(" "),
-        _c("th", { attrs: { colspan: "2" } }, [_vm._v("Action")]),
+        _c("th", [_vm._v("Vehicle Allocated")]),
+        _vm._v(" "),
+        _c("th", { attrs: { colspan: "4" } }, [_vm._v("Action")]),
       ]),
     ])
   },
@@ -60480,7 +60924,7 @@ var staticRenderFns = [
       _c(
         "h5",
         { staticClass: "modal-title", attrs: { id: "staticBackdropLabel" } },
-        [_vm._v("Modal title")]
+        [_vm._v("Allocate Order to a vehicle")]
       ),
       _vm._v(" "),
       _c(
@@ -60522,10 +60966,12 @@ var render = function () {
   var _c = _vm._self._c || _h
   return _c("main", { staticClass: "container" }, [
     _c("section", { staticClass: "container" }, [
-      _c("div", { staticClass: "row" }, [
+      _vm._m(0),
+      _vm._v(" "),
+      _c("div", { staticClass: "row mt-5" }, [
         _c("div", { staticClass: "col" }, [
           _c("table", { staticClass: "table table-bordered" }, [
-            _vm._m(0),
+            _vm._m(1),
             _vm._v(" "),
             _c(
               "tbody",
@@ -60536,6 +60982,56 @@ var render = function () {
                   _c("td", [_vm._v(_vm._s(vehicle.reg_no))]),
                   _vm._v(" "),
                   _c("td", [_vm._v(_vm._s(vehicle.vehicle_status))]),
+                  _vm._v(" "),
+                  _c("td", [_vm._v(_vm._s(vehicle.orders.length))]),
+                  _vm._v(" "),
+                  _c("td", [
+                    vehicle.vehicle_status === "Available"
+                      ? _c("div", [
+                          vehicle.orders.length
+                            ? _c("div", [
+                                _c(
+                                  "button",
+                                  {
+                                    staticClass: "btn btn-outline-success",
+                                    on: {
+                                      click: function ($event) {
+                                        return _vm.markLoading(vehicle)
+                                      },
+                                    },
+                                  },
+                                  [_vm._v("Mark Loading")]
+                                ),
+                              ])
+                            : _c("div", [
+                                _vm._v(
+                                  "\n                                    No Orders Assigned\n                                "
+                                ),
+                              ]),
+                        ])
+                      : vehicle.vehicle_status === "Loading"
+                      ? _c("div", [
+                          _c(
+                            "button",
+                            {
+                              staticClass: "btn btn-outline-primary",
+                              on: {
+                                click: function ($event) {
+                                  return _vm.markOnTransit(vehicle)
+                                },
+                              },
+                            },
+                            [_vm._v("Mark On Transit")]
+                          ),
+                        ])
+                      : vehicle.vehicle_status === "On_transit"
+                      ? _c("div", [
+                          _vm._v(
+                            "\n                                On Transit\n                            "
+                          ),
+                        ])
+                      : _vm._e(),
+                  ]),
                   _vm._v(" "),
                   _c("td", [
                     _c(
@@ -60561,7 +61057,7 @@ var render = function () {
                     ),
                   ]),
                   _vm._v(" "),
-                  _vm._m(1, true),
+                  _vm._m(2, true),
                 ])
               }),
               0
@@ -60584,7 +61080,7 @@ var render = function () {
             [
               _c("div", { staticClass: "modal-dialog" }, [
                 _c("div", { staticClass: "modal-content" }, [
-                  _vm._m(2),
+                  _vm._m(3),
                   _vm._v(" "),
                   _c(
                     "form",
@@ -60676,19 +61172,6 @@ var render = function () {
           ),
           _vm._v(" "),
           _c(
-            "button",
-            {
-              staticClass: "btn btn-outline-primary",
-              attrs: {
-                type: "button",
-                "data-toggle": "modal",
-                "data-target": "#addDepotModal",
-              },
-            },
-            [_vm._v("\n                    Add Vehicle\n                ")]
-          ),
-          _vm._v(" "),
-          _c(
             "div",
             {
               staticClass: "modal fade",
@@ -60704,7 +61187,7 @@ var render = function () {
             [
               _c("div", { staticClass: "modal-dialog" }, [
                 _c("div", { staticClass: "modal-content" }, [
-                  _vm._m(3),
+                  _vm._m(4),
                   _vm._v(" "),
                   _c(
                     "form",
@@ -60821,6 +61304,27 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "row" }, [
+      _c("div", { staticClass: "col" }, [
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-outline-primary",
+            attrs: {
+              type: "button",
+              "data-toggle": "modal",
+              "data-target": "#addDepotModal",
+            },
+          },
+          [_vm._v("\n                    Add Vehicle\n                ")]
+        ),
+      ]),
+    ])
+  },
+  function () {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
     return _c("thead", [
       _c("tr", [
         _c("th", [_vm._v("#")]),
@@ -60829,7 +61333,9 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", [_vm._v("Status")]),
         _vm._v(" "),
-        _c("th", { attrs: { colspan: "2" } }, [_vm._v("Action")]),
+        _c("th", [_vm._v("Orders")]),
+        _vm._v(" "),
+        _c("th", { attrs: { colspan: "4" } }, [_vm._v("Action")]),
       ]),
     ])
   },

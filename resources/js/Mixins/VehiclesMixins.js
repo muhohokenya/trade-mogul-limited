@@ -8,6 +8,41 @@ export default {
             }).catch(error => {
                 return  error.response.data.errors
             })
+        },
+        markVehicleLoading(vehicle) {
+            let url = base_url + 'vehicles/mark_loading'
+            let data = {
+                vehicle:vehicle.id
+            };
+            return axios.post(url,data).then(response => {
+                return response
+            }).catch(error => {
+                return  error.response.data.errors
+            })
+        },
+
+        markVehicleOnTransit(vehicle) {
+            let url = base_url + 'vehicles/mark_on_transit'
+            let data = {
+                vehicle:vehicle.id
+            };
+            return axios.post(url,data).then(response => {
+                return response
+            }).catch(error => {
+                return  error.response.data.errors
+            })
+        },
+
+        markVehicleAvailable(vehicle) {
+            let url = base_url + 'vehicles/mark_available'
+            let data = {
+                vehicle:vehicle.id
+            };
+            return axios.post(url,data).then(response => {
+                return response
+            }).catch(error => {
+                return  error.response.data.errors
+            })
         }
     }
 }

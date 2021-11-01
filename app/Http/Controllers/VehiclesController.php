@@ -32,7 +32,7 @@ class VehiclesController extends Controller
 
     public function getAll(): JsonResponse
     {
-        return response()->json(Vehicle::all());
+        return response()->json(Vehicle::query()->with(['orders'])->get());
     }
 
     /**
@@ -101,5 +101,24 @@ class VehiclesController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+
+    public function markVehicleLoading(Request $request)
+    {
+        $vehicle_id = $request->get('vehicle');
+        Vehicle::markVehicleLoading($vehicle_id);
+    }
+
+    public function markVehicleOnTransit(Request $request)
+    {
+        $vehicle_id = $request->get('vehicle');
+        Vehicle::markVehicleOnTransit($vehicle_id);
+    }
+
+    public function markVehicleAvailable(Request $request)
+    {
+        $vehicle_id = $request->get('vehicle');
+        Vehicle::markVehicleAvailable($vehicle_id);
     }
 }

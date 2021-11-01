@@ -26,9 +26,18 @@ Route::group(['prefix'=>'depots'],function (){
 Route::group(['prefix'=>'vehicles'],function (){
     Route::get('/',[\App\Http\Controllers\VehiclesController::class,'getAll']);
     Route::post('/',[\App\Http\Controllers\VehiclesController::class,'store']);
+    Route::post('/mark_loading',[\App\Http\Controllers\VehiclesController::class,'markVehicleLoading']);
+    Route::post('/mark_on_transit',[\App\Http\Controllers\VehiclesController::class,'markVehicleOnTransit']);
+    Route::post('/mark_available',[\App\Http\Controllers\VehiclesController::class,'markVehicleAvailable']);
     Route::put('/{id}',[\App\Http\Controllers\VehiclesController::class,'update']);
 });
 
 Route::group(['prefix'=>'orders'],function (){
     Route::get('/',[\App\Http\Controllers\OrdersController::class,'getAll']);
+    Route::get('/loading',[\App\Http\Controllers\OrdersController::class,'getLoadingOrders']);
+    Route::get('/dispatched',[\App\Http\Controllers\OrdersController::class,'getDispatchedOrders']);
+    Route::get('/pending',[\App\Http\Controllers\OrdersController::class,'getPendingOrders']);
+    Route::post('/allocate',[\App\Http\Controllers\OrdersController::class,'allocate']);
+    Route::post('/mark_order_dispatched',[\App\Http\Controllers\OrdersController::class,'markOrderDispatched']);
+    Route::post('/mark_order_delivered',[\App\Http\Controllers\OrdersController::class,'markOrderDelivered']);
 });
