@@ -14,7 +14,9 @@ import Notifications from 'vue-notification'
 
 
 window.Vue = require('vue').default;
-window.base_url = "http://localhost/trade_mogul/public/api/"
+// window.base_url = "http://localhost/trade_mogul/public/api/"
+window.base_url = "http://solutech.covid-19.co.ke/api/"
+
 
 Vue.use(VueSweetalert2);
 Vue.use(Notifications);

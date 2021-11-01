@@ -2904,8 +2904,9 @@ __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 
 
 
-window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js")["default"];
-window.base_url = "http://localhost/trade_mogul/public/api/";
+window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm.js")["default"]; // window.base_url = "http://localhost/trade_mogul/public/api/"
+
+window.base_url = "http://solutech.covid-19.co.ke/api/";
 Vue.use((vue_sweetalert2__WEBPACK_IMPORTED_MODULE_0___default()));
 Vue.use((vue_notification__WEBPACK_IMPORTED_MODULE_2___default()));
 /**
