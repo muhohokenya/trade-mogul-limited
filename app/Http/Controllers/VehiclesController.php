@@ -100,7 +100,7 @@ class VehiclesController extends Controller
      */
     public function destroy($id)
     {
-        //
+        Vehicle::query()->find($id)->delete();
     }
 
 
@@ -120,5 +120,12 @@ class VehiclesController extends Controller
     {
         $vehicle_id = $request->get('vehicle');
         Vehicle::markVehicleAvailable($vehicle_id);
+    }
+
+    public function getAvailableVehicles(): JsonResponse
+    {
+        return response()->json(
+            Vehicle::getAvailableVehicles()
+        );
     }
 }

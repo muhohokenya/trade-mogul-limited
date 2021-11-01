@@ -25,11 +25,13 @@ Route::group(['prefix'=>'depots'],function (){
 
 Route::group(['prefix'=>'vehicles'],function (){
     Route::get('/',[\App\Http\Controllers\VehiclesController::class,'getAll']);
+    Route::get('/available',[\App\Http\Controllers\VehiclesController::class,'getAvailableVehicles']);
     Route::post('/',[\App\Http\Controllers\VehiclesController::class,'store']);
     Route::post('/mark_loading',[\App\Http\Controllers\VehiclesController::class,'markVehicleLoading']);
     Route::post('/mark_on_transit',[\App\Http\Controllers\VehiclesController::class,'markVehicleOnTransit']);
     Route::post('/mark_available',[\App\Http\Controllers\VehiclesController::class,'markVehicleAvailable']);
     Route::put('/{id}',[\App\Http\Controllers\VehiclesController::class,'update']);
+    Route::delete('/delete/{id}',[\App\Http\Controllers\VehiclesController::class,'destroy']);
 });
 
 Route::group(['prefix'=>'orders'],function (){

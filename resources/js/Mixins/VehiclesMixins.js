@@ -9,6 +9,15 @@ export default {
                 return  error.response.data.errors
             })
         },
+
+        fetchAvailableVehicles() {
+            let url = base_url + 'vehicles/available'
+            return axios.get(url).then(response => {
+                return response
+            }).catch(error => {
+                return  error.response.data.errors
+            })
+        },
         markVehicleLoading(vehicle) {
             let url = base_url + 'vehicles/mark_loading'
             let data = {
@@ -39,6 +48,15 @@ export default {
                 vehicle:vehicle.id
             };
             return axios.post(url,data).then(response => {
+                return response
+            }).catch(error => {
+                return  error.response.data.errors
+            })
+        },
+
+        delete(vehicle) {
+            let url = base_url + 'vehicles/delete/'+vehicle.id
+            return axios.delete(url).then(response => {
                 return response
             }).catch(error => {
                 return  error.response.data.errors

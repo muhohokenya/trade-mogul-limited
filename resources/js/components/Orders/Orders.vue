@@ -160,7 +160,7 @@ export default {
         this.fetchOrders()
 
         //Reusable Method from the Mixins
-        this.fetchVehicles().then(response => {
+        this.fetchAvailableVehicles().then(response => {
             this.vehicles = response.data
         })
     },

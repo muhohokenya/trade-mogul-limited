@@ -56,6 +56,10 @@ class Vehicle extends Model
         ]);
     }
 
+    public static function getAvailableVehicles(){
+        return self::query()->where('vehicle_status','=','available')->get();
+    }
+
     public function setRegNoAttribute($value)
     {
         $this->attributes['reg_no'] = strtoupper($value);

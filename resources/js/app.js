@@ -6,10 +6,18 @@
 
 require('./bootstrap');
 
+import VueSweetalert2 from 'vue-sweetalert2';
+
+// If you don't need the styles, do not connect
+import 'sweetalert2/dist/sweetalert2.min.css';
+import Notifications from 'vue-notification'
+
+
 window.Vue = require('vue').default;
 window.base_url = "http://localhost/trade_mogul/public/api/"
 
-
+Vue.use(VueSweetalert2);
+Vue.use(Notifications);
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue

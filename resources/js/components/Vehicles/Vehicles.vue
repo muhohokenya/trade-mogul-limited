@@ -49,7 +49,7 @@
                                     <button class="btn btn-outline-primary" @click="markOnTransit(vehicle)">Mark On Transit</button>
                                 </div>
                                 <div v-else-if="vehicle.vehicle_status==='On_transit'">
-                                    On Transit
+                                    <button class="btn btn-outline-primary" @click="makeVehicleAvailable(vehicle)">Make Available</button>
                                 </div>
                             </td>
 
@@ -61,7 +61,8 @@
                                 </button>
                             </td>
                             <td>
-                                <button class="btn btn-outline-danger">Delete</button>
+                                <button v-if="vehicle.orders.length===0" class="btn btn-outline-danger" @click="deleteVehicle(vehicle)">Delete</button>
+                                <button v-else class="btn btn-danger" disabled>Delete</button>
                             </td>
                         </tr>
                         </tbody>
@@ -145,6 +146,7 @@
                             </div>
                         </div>
                     </div>
+                    <notifications/>
 
                 </div>
             </div>
@@ -192,6 +194,42 @@ export default {
 
 
     methods: {
+        makeVehicleAvailable(vehicle){
+            this.markVehicleAvailable(vehicle).
+            then(response=>{
+                this.getVehicles()
+                this.$notify({
+                    title:'Available'
+                })
+            }).catch(error=>{
+
+            });
+        },
+        deleteVehicle(vehicle){
+            this.$swal({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.delete(vehicle).then(response=>{
+                        this.getVehicles()
+                        this.$swal(
+                            'Deleted!',
+                            'Your file has been deleted.',
+                            'success'
+                        )
+                    }).catch(error=>{
+
+                    })
+
+                }
+            })
+        },
         markLoading(vehicle){
             this.markVehicleLoading(vehicle).then(response=>{
                 this.getVehicles()
