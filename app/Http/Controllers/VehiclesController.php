@@ -87,9 +87,7 @@ class VehiclesController extends Controller
             'reg_no'=>$request->get('edit_vehicle')
         ]);
 
-        return response()->json(
-            Vehicle::getVehicleById($id)
-        );
+        $this->getAll();
     }
 
     /**
