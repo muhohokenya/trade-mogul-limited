@@ -19,6 +19,10 @@ class Order extends Model
         return $this->belongsTo(Vehicle::class);
     }
 
+    public function depot(){
+        return $this->belongsTo(Depot::class);
+    }
+
     public static function markOrderComplete($order){
         self::query()->find($order)->update([
             'order_status'=>'dispatched'

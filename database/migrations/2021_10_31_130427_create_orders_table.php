@@ -18,6 +18,8 @@ class CreateOrdersTable extends Migration
             $table->string('item');
             $table->unsignedBigInteger('vehicle_id')->nullable();
             $table->foreign('vehicle_id')->references('id')->on('vehicles');
+            $table->unsignedBigInteger('depot_id')->nullable();
+            $table->foreign('depot_id')->references('id')->on('depots');
             $table->enum('order_status',['pending','loading','dispatched','delivered'])->default('pending');
             $table->timestamps();
         });
